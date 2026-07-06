@@ -25,10 +25,16 @@ echo "[SMAPS] Running migrations..."
 php artisan migrate --no-interaction --force
 
 # Seed if users table is empty
+echo "[SMAPS] Checking database status..."
+set +e
 USER_COUNT=$(php artisan tinker --execute="echo App\Models\User::count();" 2>/dev/null | grep -E '^[0-9]+$' | head -1)
+set -e
+
 if [ -z "$USER_COUNT" ] || [ "$USER_COUNT" = "0" ]; then
-    echo "[SMAPS] Seeding database..."
+    echo "[SMAPS] Database empty. Seeding database..."
     php artisan db:seed --no-interaction --force
+else
+    echo "[SMAPS] Database already contains $USER_COUNT users. Skipping seeding."
 fi
 
 # Clear caches
