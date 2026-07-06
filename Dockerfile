@@ -19,7 +19,7 @@ WORKDIR /var/www/html
 # Copy dependency files first (layer cache)
 COPY composer.json composer.lock ./
 
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+RUN composer install --no-scripts --no-autoloader --prefer-dist
 
 # Copy full source
 COPY . .
