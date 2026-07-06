@@ -5,6 +5,9 @@ use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\QueueController;
 use Illuminate\Support\Facades\Route;
 
+// Health check (for Docker)
+Route::get('/health', fn () => response()->json(['status' => 'ok', 'service' => 'SMAPS']));
+
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
