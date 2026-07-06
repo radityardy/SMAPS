@@ -34,9 +34,11 @@ RUN mkdir -p storage/logs \
     && mkdir -p bootstrap/cache \
     && chmod -R 777 storage bootstrap/cache
 
-# Copy & set entrypoint
+# Copy & set entrypoint with CRLF conversion (dos2unix)
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN apk add --no-cache dos2unix \
+    && dos2unix /usr/local/bin/docker-entrypoint.sh \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8069
 
