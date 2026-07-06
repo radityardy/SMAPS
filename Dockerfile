@@ -26,14 +26,18 @@ COPY . .
 
 RUN composer dump-autoload --optimize
 
-# Ensure storage dirs exist and are writable
-RUN mkdir -p storage/logs storage/framework/{sessions,views,cache} bootstrap/cache \
+# Ensure storage dirs exist and are writable (no brace expansion - use sh-safe syntax)
+RUN mkdir -p storage/logs \
+    && mkdir -p storage/framework/sessions \
+    && mkdir -p storage/framework/views \
+    && mkdir -p storage/framework/cache \
+    && mkdir -p bootstrap/cache \
     && chmod -R 777 storage bootstrap/cache
 
 # Copy & set entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 8000
+EXPOSE 8069
 
 ENTRYPOINT ["docker-entrypoint.sh"]

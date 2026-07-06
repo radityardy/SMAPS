@@ -10,8 +10,8 @@ Backend API for SMAPS. Built with Laravel 11 and SQLite.
    ```bash
    docker compose up --build
    ```
-2. API running on: http://localhost:8000
-3. Health check: http://localhost:8000/api/health
+2. API running on: http://localhost:8069
+3. Health check: http://localhost:8069/api/health
 
 ### Option 2: Local PHP
 
@@ -83,4 +83,4 @@ All accounts use password: `password`
 ---
 
 ## Interactive Documentation
-Open http://localhost:8000/docs in your browser to view the OpenAPI specification.
+Open http://localhost:8069/docs in your browser to view the OpenAPI specification.

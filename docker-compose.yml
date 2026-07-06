@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: smaps-app
     ports:
-      - "8000:8000"
+      - "8069:8069"
     volumes:
       # Persist SQLite database across restarts
       - smaps-db:/var/www/html/database
@@ -16,7 +16,7 @@ services:
       APP_DEBUG: "false"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8000/api/health"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:8069/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
