@@ -1,14 +1,14 @@
-FROM php:8.4-cli-alpine
+FROM php:8.4-cli
 
 # Install system deps
-RUN apk add --no-cache \
-    bash \
+RUN apt-get update && apt-get install -y \
     git \
     unzip \
-    sqlite \
-    sqlite-dev \
     libzip-dev \
-    oniguruma-dev \
+    sqlite3 \
+    libsqlite3-dev \
+    dos2unix \
+    && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install pdo pdo_sqlite zip
 
 # Install Composer
@@ -26,7 +26,7 @@ COPY . .
 
 RUN composer dump-autoload --optimize
 
-# Ensure storage dirs exist and are writable (no brace expansion - use sh-safe syntax)
+# Ensure storage dirs exist and are writable
 RUN mkdir -p storage/logs \
     && mkdir -p storage/framework/sessions \
     && mkdir -p storage/framework/views \
@@ -36,8 +36,7 @@ RUN mkdir -p storage/logs \
 
 # Copy & set entrypoint with CRLF conversion (dos2unix)
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN apk add --no-cache dos2unix \
-    && dos2unix /usr/local/bin/docker-entrypoint.sh \
+RUN dos2unix /usr/local/bin/docker-entrypoint.sh \
     && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8069
