@@ -1,0 +1,561 @@
+openapi: 3.0.3
+info:
+  title: SMAPS API - Smart Medical Queue System
+  version: 1.0.0
+  description: API BackEnd untuk Sistem Antrean Medis Pintar (SMAPS).
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+paths:
+  /register:
+    post:
+      summary: Register patient account
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  example: Raditya Ardy
+                email:
+                  type: string
+                  format: email
+                  example: raditya@smaps.test
+                password:
+                  type: string
+                  format: password
+                  example: password123
+                phone:
+                  type: string
+                  example: "081234567890"
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+                  user:
+                    $ref: '#/components/schemas/User'
+        '422':
+          description: Validation error
+
+  /login:
+    post:
+      summary: Login user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@smaps.test
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  token:
+                    type: string
+                    example: 1|laravel_sanctum_token
+                  user:
+                    $ref: '#/components/schemas/User'
+        '422':
+          description: Invalid credentials
+
+  /logout:
+    post:
+      summary: Logout user
+      tags:
+        - Auth
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out
+
+  /me:
+    get:
+      summary: Get current authenticated user
+      tags:
+        - Auth
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+
+  /doctors:
+    get:
+      summary: List all active doctors
+      tags:
+        - Doctors
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doctors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Doctor'
+    post:
+      summary: Create new doctor (Admin only)
+      tags:
+        - Doctors
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - specialization
+                - queue_prefix
+              properties:
+                name:
+                  type: string
+                  example: Dr. Gregory House
+                email:
+                  type: string
+                  format: email
+                  example: house@smaps.test
+                password:
+                  type: string
+                  format: password
+                  example: password123
+                phone:
+                  type: string
+                  example: "0811223344"
+                specialization:
+                  type: string
+                  example: Diagnostic Medicine
+                queue_prefix:
+                  type: string
+                  example: H
+                is_active:
+                  type: boolean
+                  default: true
+      responses:
+        '201':
+          description: Doctor created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Doctor created
+                  doctor:
+                    $ref: '#/components/schemas/Doctor'
+
+  /doctors/{id}:
+    get:
+      summary: Get doctor detail
+      tags:
+        - Doctors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doctor:
+                    $ref: '#/components/schemas/Doctor'
+    put:
+      summary: Update doctor (Admin only)
+      tags:
+        - Doctors
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Dr. Gregory House II
+                email:
+                  type: string
+                  format: email
+                  example: house2@smaps.test
+                password:
+                  type: string
+                  format: password
+                  example: newpassword123
+                phone:
+                  type: string
+                  example: "0811223344"
+                specialization:
+                  type: string
+                  example: Nephrology
+                queue_prefix:
+                  type: string
+                  example: HN
+                is_active:
+                  type: boolean
+      responses:
+        '200':
+          description: Doctor updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Doctor updated
+                  doctor:
+                    $ref: '#/components/schemas/Doctor'
+    delete:
+      summary: Delete doctor (Admin only)
+      tags:
+        - Doctors
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Doctor deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Doctor deleted
+
+  /doctors/{id}/summary:
+    get:
+      summary: Get doctor queue summary
+      tags:
+        - Doctors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doctor:
+                    $ref: '#/components/schemas/Doctor'
+                  summary:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 10
+                      waiting:
+                        type: integer
+                        example: 3
+                      called:
+                        type: integer
+                        example: 1
+                      serving:
+                        type: integer
+                        example: 1
+                      done:
+                        type: integer
+                        example: 4
+                      skipped:
+                        type: integer
+                        example: 1
+                  current_queue:
+                    $ref: '#/components/schemas/Queue'
+
+  /queues:
+    get:
+      summary: List queues (Admin/Doctor lists all, Patient lists own)
+      tags:
+        - Queues
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queues:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Queue'
+    post:
+      summary: Register for a queue (Patient only)
+      tags:
+        - Queues
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - doctor_id
+              properties:
+                doctor_id:
+                  type: integer
+                  example: 1
+      responses:
+        '201':
+          description: Queue registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Queue registered successfully
+                  queue:
+                    $ref: '#/components/schemas/Queue'
+
+  /queues/status:
+    get:
+      summary: Check current queue status (realtime display)
+      tags:
+        - Queues
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queues:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Queue'
+
+  /queues/{id}/status:
+    get:
+      summary: Check specific queue item status
+      tags:
+        - Queues
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queue:
+                    $ref: '#/components/schemas/Queue'
+                  estimated_time:
+                    type: string
+                    example: "10:30"
+                  waiting_count:
+                    type: integer
+                    example: 3
+    put:
+      summary: Update queue status (Doctor/Admin only)
+      tags:
+        - Queues
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [waiting, called, serving, done, skipped]
+                  example: called
+      responses:
+        '200':
+          description: Queue status updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Queue status updated to called
+                  queue:
+                    $ref: '#/components/schemas/Queue'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Raditya Ardy
+        email:
+          type: string
+          example: raditya@smaps.test
+        role:
+          type: string
+          enum: [admin, doctor, patient]
+          example: patient
+        phone:
+          type: string
+          nullable: true
+          example: "081234567890"
+    Doctor:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 2
+        name:
+          type: string
+          example: Dr. Gregory House
+        email:
+          type: string
+          example: house@smaps.test
+        phone:
+          type: string
+          nullable: true
+          example: "0811223344"
+        specialization:
+          type: string
+          example: Diagnostic Medicine
+        queue_prefix:
+          type: string
+          example: H
+        is_active:
+          type: boolean
+          example: true
+    Queue:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        queue_number:
+          type: string
+          example: H-001
+        status:
+          type: string
+          enum: [waiting, called, serving, done, skipped]
+          example: waiting
+        patient:
+          $ref: '#/components/schemas/User'
+        doctor:
+          $ref: '#/components/schemas/Doctor'
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-07-06T09:00:00Z"
