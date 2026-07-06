@@ -43,4 +43,4 @@ php artisan route:clear 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 
 echo "[SMAPS] API running at http://0.0.0.0:8069"
-exec php artisan serve --host=0.0.0.0 --port=8069
+exec php -S 0.0.0.0:8069 server.php
